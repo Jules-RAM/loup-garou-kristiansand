@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+:root {
+  --parchment: #f4e8d0;
+  --parchment-dark: #d4c4a0;
+  --ink: #1a1410;
+  --ink-soft: #3a2f25;
+  --burgundy: #6b1f2a;
+  --burgundy-light: #8b3340;
+  --forest: #2d4a3a;
+  --forest-light: #3d6a50;
+  --gold: #b8954a;
+  --gold-bright: #d4b066;
+  --moonlight: #a8c0d6;
+  --night-deep: #0a0e1a;
+  --night-soft: #1a2030;
+  --ember: #d97a3a;
+  --blood: #8b1a1a;
+}
+
+@theme inline {
+  --color-parchment: var(--parchment);
+  --color-parchment-dark: var(--parchment-dark);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-burgundy: var(--burgundy);
+  --color-burgundy-light: var(--burgundy-light);
+  --color-forest: var(--forest);
+  --color-forest-light: var(--forest-light);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-moonlight: var(--moonlight);
+  --color-night-deep: var(--night-deep);
+  --color-night-soft: var(--night-soft);
+  --color-ember: var(--ember);
+  --color-blood: var(--blood);
+  --font-title: var(--font-title);
+  --font-body: var(--font-body);
+  --font-ui: var(--font-ui);
+}
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font-body), "Crimson Pro", serif;
+}
+
+/* Parchment texture overlay */
+.parchment-bg {
+  background-color: var(--parchment);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(180, 160, 120, 0.15) 0%, transparent 70%),
+    radial-gradient(ellipse at 80% 50%, rgba(180, 160, 120, 0.1) 0%, transparent 70%);
+}
+
+/* Night background */
+.night-bg {
+  background: linear-gradient(180deg, var(--night-deep) 0%, var(--night-soft) 50%, #0d1525 100%);
+  color: var(--moonlight);
+}
+
+/* Card styles */
+.card-container {
+  perspective: 1000px;
+}
+
+.card-inner {
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+  transform-style: preserve-3d;
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  backface-visibility: hidden;
+  position: absolute;
+  inset: 0;
+}
+
+.card-front {
+  transform: rotateY(180deg);
+}
+
+/* Gold shimmer animation */
+@keyframes shimmer {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.gold-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Pulse animation for selected card */
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 8px rgba(184, 149, 74, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(184, 149, 74, 0.8); }
+}
+
+.pulse-gold {
+  animation: pulse-gold 1.5s ease-in-out infinite;
+}
+
+/* Typing animation for narration */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typing-cursor::after {
+  content: "|";
+  animation: blink 0.7s step-end infinite;
+  color: var(--gold);
+}
+
+/* Fog animation */
+@keyframes drift {
+  0% { transform: translateX(-10%) translateY(0); opacity: 0.3; }
+  50% { transform: translateX(5%) translateY(-5px); opacity: 0.5; }
+  100% { transform: translateX(-10%) translateY(0); opacity: 0.3; }
+}
+
+.fog {
+  animation: drift 8s ease-in-out infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 3px;
+}
