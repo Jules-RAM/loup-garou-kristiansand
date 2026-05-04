@@ -24,11 +24,13 @@ import {
 } from "./engine";
 import { validateComposition } from "./roles";
 
-// Server-side Supabase client (with service role for broadcasting)
-const supabaseServer = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Server-side Supabase client (lazy init to avoid build errors without env vars)
+function getSupabaseServer() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 // In-memory game store (for MVP — migrate to Redis/DB for production)
 const games = new Map<string, GameState>();
@@ -437,7 +439,9 @@ function scheduleVoteResolution(code: string, delayMs: number) {
 // ============================================================
 
 async function broadcastState(game: GameState) {
-  const channel = supabaseServer.channel(`game:${game.code}`);
+  const supabase = getSupabaseServer();
+  if (!supabase) return;
+  const channel = supabase.channel(`game:${game.code}`);
 
   // Send personalized state to each player
   for (const player of game.players) {
@@ -455,7 +459,9 @@ async function broadcastToPlayer(
   playerId: string,
   data: Record<string, unknown>
 ) {
-  const channel = supabaseServer.channel(`game:${code}`);
+  const supabase = getSupabaseServer();
+  if (!supabase) return;
+  const channel = supabase.channel(`game:${code}`);
   await channel.send({
     type: "broadcast",
     event: "game_event",
@@ -471,7 +477,9 @@ async function broadcastChat(code: string, msg: ChatMessage) {
   const game = games.get(code);
   if (!game) return;
 
-  const channel = supabaseServer.channel(`game:${code}`);
+  const supabase = getSupabaseServer();
+  if (!supabase) return;
+  const channel = supabase.channel(`game:${code}`);
 
   // Determine recipients based on channel
   let recipients = game.players;
