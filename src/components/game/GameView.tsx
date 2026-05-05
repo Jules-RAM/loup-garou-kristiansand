@@ -18,6 +18,7 @@ interface GameViewProps {
   onNightAction: (targetId: string | null, extra?: Record<string, unknown>) => Promise<boolean>;
   onSendChat: (content: string, channel?: string) => Promise<boolean>;
   onSendAction: (action: string, data?: Record<string, unknown>) => Promise<boolean>;
+  onReplay: () => void;
 }
 
 const NIGHT_PHASES: Phase[] = [
@@ -35,6 +36,7 @@ export function GameView({
   onNightAction,
   onSendChat,
   onSendAction,
+  onReplay,
 }: GameViewProps) {
   const { t } = useI18n();
   const [showMyCard, setShowMyCard] = useState(false);
@@ -48,7 +50,7 @@ export function GameView({
   const aliveCount = gameState.players.filter((p) => p.alive).length;
 
   if (isGameOver) {
-    return <GameOverView gameState={gameState} />;
+    return <GameOverView gameState={gameState} onReplay={onReplay} />;
   }
 
   return (

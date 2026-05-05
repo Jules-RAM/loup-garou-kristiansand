@@ -313,14 +313,21 @@ export const translations = {
     en: "Play again",
   },
   "gameover.new_game": {
-    fr: "Nouvelle partie",
-    no: "Nytt spill",
-    en: "New game",
+    fr: "Retour au menu",
+    no: "Tilbake til meny",
+    en: "Back to menu",
   },
   "gameover.final_roles": {
     fr: "Roles finaux",
     no: "Endelige roller",
     en: "Final roles",
+  },
+
+  // ---- Navigation ----
+  "nav.back_to_menu": {
+    fr: "Retour au menu",
+    no: "Tilbake til meny",
+    en: "Back to menu",
   },
 
   // ---- Distribution ----

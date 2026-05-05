@@ -160,6 +160,14 @@ export function LobbyView({ gameCode, playerId, gameState, onStartGame }: LobbyV
       )}
 
       {error && <p className="text-burgundy text-sm mt-3 font-ui">{error}</p>}
+
+      {/* Back to menu */}
+      <button
+        onClick={() => window.location.href = "/"}
+        className="mt-6 text-ink-soft text-sm font-ui hover:text-ink transition-colors"
+      >
+        {t("nav.back_to_menu")}
+      </button>
     </div>
   );
 }

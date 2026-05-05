@@ -1,6 +1,7 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useGame } from "@/hooks/useGame";
 import { LobbyView } from "@/components/lobby/LobbyView";
 import { GameView } from "@/components/game/GameView";
@@ -18,6 +19,7 @@ function getPseudo(): string {
 
 export default function GamePage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
+  const router = useRouter();
   const [playerId, setPlayerId] = useState("");
   const [pseudo, setPseudo] = useState("");
   const [joined, setJoined] = useState(false);
@@ -41,6 +43,14 @@ export default function GamePage({ params }: { params: Promise<{ code: string }>
       body: JSON.stringify({ code, playerId, pseudo }),
     }).then(() => setJoined(true));
   }, [playerId, pseudo, code, joined]);
+
+  const handleReplay = useCallback(async () => {
+    await fetch("/api/game/replay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gameCode: code, playerId }),
+    });
+  }, [code, playerId]);
 
   if (!playerId) {
     return (
@@ -81,6 +91,7 @@ export default function GamePage({ params }: { params: Promise<{ code: string }>
           onNightAction={nightAction}
           onSendChat={sendChat}
           onSendAction={sendAction}
+          onReplay={handleReplay}
         />
       )}
     </div>

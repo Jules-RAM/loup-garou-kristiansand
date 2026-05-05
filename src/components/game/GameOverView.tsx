@@ -10,9 +10,10 @@ import { VillageIcon, WolfIcon, HeartArrowIcon } from "@/components/ui/Icons";
 
 interface GameOverViewProps {
   gameState: ClientGameState;
+  onReplay: () => void;
 }
 
-export function GameOverView({ gameState }: GameOverViewProps) {
+export function GameOverView({ gameState, onReplay }: GameOverViewProps) {
   const { t } = useI18n();
 
   const winnerKey =
@@ -79,7 +80,11 @@ export function GameOverView({ gameState }: GameOverViewProps) {
 
       {/* Actions */}
       <div className="flex gap-3 mt-8">
+        <GrimoireButton onClick={onReplay}>
+          {t("gameover.play_again")}
+        </GrimoireButton>
         <GrimoireButton
+          variant="secondary"
           onClick={() => window.location.href = "/"}
         >
           {t("gameover.new_game")}
