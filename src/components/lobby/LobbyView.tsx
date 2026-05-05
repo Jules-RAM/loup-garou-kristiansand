@@ -141,7 +141,7 @@ export function LobbyView({ gameCode, playerId, gameState, onStartGame }: LobbyV
       {isHost && (
         <GrimoireButton
           onClick={handleStart}
-          disabled={!isBalanced || players.length < 4 || starting}
+          disabled={!isBalanced || players.length < 2 || starting}
         >
           {starting ? "..." : t("lobby.start")}
         </GrimoireButton>
