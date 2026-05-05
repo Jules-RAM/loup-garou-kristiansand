@@ -6,6 +6,7 @@ import { ClientGameState } from "@/types/game";
 import { TranslationKey } from "@/i18n/translations";
 import { RoleCard } from "@/components/cards/RoleCard";
 import { GrimoireButton } from "@/components/ui/GrimoireButton";
+import { VillageIcon, WolfIcon, HeartArrowIcon } from "@/components/ui/Icons";
 
 interface GameOverViewProps {
   gameState: ClientGameState;
@@ -40,9 +41,9 @@ export function GameOverView({ gameState }: GameOverViewProps) {
         <h1 className="font-title text-2xl md:text-3xl font-bold mb-2">
           {t(winnerKey as TranslationKey)}
         </h1>
-        <p className="font-body text-parchment/80 text-sm">
-          {gameState.winner === "village" ? "🏠" : gameState.winner === "loups" ? "🐺" : "💘"}
-        </p>
+        <div className="flex justify-center mt-2 text-parchment/80">
+          {gameState.winner === "village" ? <VillageIcon size={28} /> : gameState.winner === "loups" ? <WolfIcon size={28} /> : <HeartArrowIcon size={28} />}
+        </div>
       </motion.div>
 
       {/* All players revealed */}

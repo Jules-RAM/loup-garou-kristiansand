@@ -6,6 +6,7 @@ import { useI18n } from "@/i18n/context";
 import { ClientGameState, Role } from "@/types/game";
 import { TranslationKey } from "@/i18n/translations";
 import { GrimoireButton } from "@/components/ui/GrimoireButton";
+import { NightSkyIcon, HealIcon, SkullIcon } from "@/components/ui/Icons";
 
 interface NightPhaseProps {
   gameState: ClientGameState;
@@ -51,7 +52,7 @@ export function NightPhase({ gameState, playerId, onNightAction }: NightPhasePro
         animate={{ opacity: 1, y: 0 }}
         className="text-center mt-8"
       >
-        <div className="text-4xl mb-4">🌙</div>
+        <NightSkyIcon size={48} className="text-moonlight mb-4" />
         <p className="text-moonlight/70 italic font-body typing-cursor">
           {narrationKey ? t(narrationKey) : "La nuit suit son cours..."}
         </p>
@@ -88,7 +89,7 @@ export function NightPhase({ gameState, playerId, onNightAction }: NightPhasePro
                   setActed(true);
                 }}
               >
-                {t("action.heal")} 💚
+                <span className="flex items-center gap-1">{t("action.heal")} <HealIcon size={14} className="text-forest" /></span>
               </GrimoireButton>
             )}
             {gameState.phaseData.canKill && (
@@ -101,7 +102,7 @@ export function NightPhase({ gameState, playerId, onNightAction }: NightPhasePro
                 }}
                 disabled={!selectedTarget}
               >
-                {t("action.kill")} ☠️
+                <span className="flex items-center gap-1">{t("action.kill")} <SkullIcon size={14} /></span>
               </GrimoireButton>
             )}
             <GrimoireButton

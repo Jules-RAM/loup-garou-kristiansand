@@ -1,9 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ReactNode } from "react";
 import { Role } from "@/types/game";
 import { useI18n } from "@/i18n/context";
 import { TranslationKey } from "@/i18n/translations";
+import {
+  MoonIcon,
+  WolfIcon,
+  CrystalBallIcon,
+  PotionIcon,
+  BowIcon,
+  HeartArrowIcon,
+  VillageIcon,
+} from "@/components/ui/Icons";
 
 interface RoleCardProps {
   role: Role | null;
@@ -15,14 +25,17 @@ interface RoleCardProps {
   className?: string;
 }
 
-const ROLE_SYMBOLS: Record<Role, string> = {
-  villageois: "🏠",
-  loup_garou: "🐺",
-  voyante: "🔮",
-  sorciere: "🧪",
-  chasseur: "🏹",
-  cupidon: "💘",
-};
+function getRoleIcon(role: Role, size: number): ReactNode {
+  const props = { size, className: "text-ink-soft" };
+  switch (role) {
+    case "villageois": return <VillageIcon {...props} />;
+    case "loup_garou": return <WolfIcon {...props} className="text-burgundy" />;
+    case "voyante": return <CrystalBallIcon {...props} className="text-purple-600" />;
+    case "sorciere": return <PotionIcon {...props} className="text-purple-800" />;
+    case "chasseur": return <BowIcon {...props} className="text-forest" />;
+    case "cupidon": return <HeartArrowIcon {...props} className="text-pink-500" />;
+  }
+}
 
 const ROLE_COLORS: Record<Role, string> = {
   villageois: "border-forest",
@@ -38,6 +51,8 @@ const SIZE_CLASSES = {
   md: "w-24 h-36",
   lg: "w-40 h-60",
 };
+
+const ICON_SIZES = { sm: 20, md: 32, lg: 48 };
 
 export function RoleCard({
   role,
@@ -67,7 +82,7 @@ export function RoleCard({
               ${dead ? "opacity-40 grayscale rotate-6" : ""}
             `}
           >
-            <div className="text-2xl mb-2">🌕</div>
+            <MoonIcon size={size === "lg" ? 32 : 20} className="text-gold mb-2" />
             <div className="text-gold text-[8px] font-title uppercase tracking-widest">
               Loup-Garou
             </div>
@@ -88,9 +103,7 @@ export function RoleCard({
               <>
                 {/* Placeholder illustration area */}
                 <div className="flex-1 flex items-center justify-center w-full bg-parchment-dark/30 rounded mb-2">
-                  <span className={size === "lg" ? "text-5xl" : size === "md" ? "text-3xl" : "text-xl"}>
-                    {ROLE_SYMBOLS[role]}
-                  </span>
+                  {getRoleIcon(role, ICON_SIZES[size])}
                 </div>
 
                 {/* Role name */}

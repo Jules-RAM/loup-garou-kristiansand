@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/i18n/context";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { GrimoireButton } from "@/components/ui/GrimoireButton";
+import { MoonIcon, WolfIcon } from "@/components/ui/Icons";
 
 function getOrCreatePlayerId(): string {
   if (typeof window === "undefined") return "";
@@ -100,11 +101,11 @@ export default function LandingPage() {
       >
         {/* Moon icon */}
         <motion.div
-          className="text-6xl mb-6"
+          className="mb-6 text-gold"
           animate={{ rotate: [0, 5, -5, 0] }}
           transition={{ duration: 6, repeat: Infinity }}
         >
-          🌕
+          <MoonIcon size={64} />
         </motion.div>
 
         {/* Title */}
@@ -217,7 +218,7 @@ export default function LandingPage() {
       {/* Decorative footer line */}
       <div className="absolute bottom-8 flex items-center gap-2 text-gold/50">
         <div className="w-12 h-px bg-gold/30" />
-        <span className="text-xs font-title">🐺</span>
+        <WolfIcon size={16} />
         <div className="w-12 h-px bg-gold/30" />
       </div>
     </div>
