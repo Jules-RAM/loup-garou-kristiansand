@@ -12,19 +12,27 @@ interface LobbyViewProps {
   gameCode: string;
   playerId: string;
   gameState: ClientGameState | null;
-  onStartGame: (composition: Record<string, number>) => Promise<boolean>;
+  onStartGame: (composition: Record<string, number>) => Promise<{ success?: boolean; error?: string }>;
 }
 
 export function LobbyView({ gameCode, playerId, gameState, onStartGame }: LobbyViewProps) {
   const { t } = useI18n();
   const players = gameState?.players ?? [];
   const isHost = gameState?.players.find((p) => p.id === playerId)?.isHost ?? false;
-  const [composition, setComposition] = useState<Record<string, number>>(() =>
-    getDefaultComposition(Math.max(players.length, 4))
-  );
+  const [composition, setComposition] = useState<Record<string, number>>({
+    loup_garou: 1,
+    villageois: 1,
+  });
+  const [lastPlayerCount, setLastPlayerCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+
+  // Recalculate default composition when player count changes
+  if (players.length !== lastPlayerCount && players.length > 0) {
+    setLastPlayerCount(players.length);
+    setComposition(getDefaultComposition(players.length));
+  }
 
   const totalRoles = Object.values(composition).reduce((a, b) => a + b, 0);
   const isBalanced = totalRoles === players.length;
@@ -48,8 +56,8 @@ export function LobbyView({ gameCode, playerId, gameState, onStartGame }: LobbyV
     if (!isBalanced) return;
     setStarting(true);
     setError("");
-    const ok = await onStartGame(composition);
-    if (!ok) setError("Erreur au lancement");
+    const result = await onStartGame(composition);
+    if (result && !result.success) setError(result.error || "Erreur au lancement");
     setStarting(false);
   };
 

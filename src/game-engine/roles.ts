@@ -85,10 +85,10 @@ export function getDefaultComposition(playerCount: number) {
   const wolfCount = Math.max(1, Math.floor(playerCount / 4));
   const composition: Record<string, number> = {
     loup_garou: wolfCount,
-    voyante: playerCount >= 6 ? 1 : 0,
-    sorciere: playerCount >= 7 ? 1 : 0,
-    chasseur: playerCount >= 8 ? 1 : 0,
-    cupidon: playerCount >= 9 ? 1 : 0,
+    voyante: playerCount >= 4 ? 1 : 0,
+    sorciere: playerCount >= 5 ? 1 : 0,
+    chasseur: playerCount >= 6 ? 1 : 0,
+    cupidon: playerCount >= 8 ? 1 : 0,
   };
 
   const specialCount = Object.values(composition).reduce((a, b) => a + b, 0);
@@ -112,8 +112,8 @@ export function validateComposition(
   }
 
   const villageCount = total - wolfCount;
-  if (villageCount < wolfCount) {
-    return { valid: false, error: "Village camp must outnumber wolves at start" };
+  if (villageCount < 1) {
+    return { valid: false, error: "At least 1 villager required" };
   }
 
   for (const [role, count] of Object.entries(composition)) {
