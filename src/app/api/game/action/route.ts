@@ -4,6 +4,9 @@ import {
   handleNightAction,
   handleVote,
   handleChat,
+  advanceFromDistribution,
+  advanceToVote,
+  resolveVotes,
 } from "@/game-engine/manager";
 
 export async function POST(req: NextRequest) {
@@ -14,11 +17,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  let result: { success: boolean; error?: string };
+  let result: { success: boolean; error?: string; reveal?: unknown };
 
   switch (action) {
     case "start_game":
       result = await startGame(gameCode, playerId, body.composition);
+      break;
+
+    case "ready":
+      // Player acknowledged role distribution — advance phase
+      await advanceFromDistribution(gameCode);
+      result = { success: true };
       break;
 
     case "night_action":
@@ -27,6 +36,14 @@ export async function POST(req: NextRequest) {
 
     case "vote":
       result = await handleVote(gameCode, playerId, body.targetId);
+      break;
+
+    case "advance_to_vote":
+      result = await advanceToVote(gameCode);
+      break;
+
+    case "resolve_votes":
+      result = await resolveVotes(gameCode);
       break;
 
     case "chat":
@@ -41,5 +58,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(result);
 }

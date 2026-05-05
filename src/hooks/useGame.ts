@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { ClientGameState, Vote } from "@/types/game";
+import { ClientGameState } from "@/types/game";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 interface UseGameOptions {
@@ -10,52 +10,68 @@ interface UseGameOptions {
   playerId: string;
 }
 
-type GameEvent =
-  | { type: "state_update"; state: ClientGameState }
-  | { type: "chat_message"; message: { authorPseudo: string; content: string; channel: string; isSystem: boolean } }
-  | { type: "error"; message: string };
-
 export function useGame({ gameCode, playerId }: UseGameOptions) {
   const [gameState, setGameState] = useState<ClientGameState | null>(null);
   const [connected, setConnected] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch state from API
+  const fetchState = useCallback(async () => {
+    if (!gameCode || !playerId) return;
+    try {
+      const res = await fetch(`/api/game/state?code=${gameCode}&playerId=${playerId}`);
+      if (res.ok) {
+        const state = await res.json();
+        setGameState(state);
+        setConnected(true);
+      }
+    } catch {
+      // Network error, will retry on next poll
+    }
+  }, [gameCode, playerId]);
 
   useEffect(() => {
-    const channel = supabase.channel(`game:${gameCode}`, {
-      config: { presence: { key: playerId } },
-    });
+    if (!gameCode || !playerId) return;
 
-    channel
-      .on("broadcast", { event: "game_state" }, ({ payload }) => {
-        const state = payload as ClientGameState;
-        if (state.myPlayerId === playerId) {
-          setGameState(state);
+    // Initial fetch
+    fetchState();
+
+    // Subscribe to Supabase Realtime (DB changes on games table)
+    const channel = supabase.channel(`db-game-${gameCode}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "games",
+          filter: `code=eq.${gameCode}`,
+        },
+        () => {
+          // When the game row changes, fetch fresh state
+          fetchState();
         }
-      })
-      .on("broadcast", { event: "game_event" }, ({ payload }) => {
-        // Handle specific events like chat messages
-        const event = payload as GameEvent;
-        if (event.type === "state_update") {
-          setGameState(event.state);
-        }
-      })
-      .on("presence", { event: "sync" }, () => {
-        setConnected(true);
-      })
-      .subscribe(async (status) => {
+      )
+      .subscribe((status) => {
         if (status === "SUBSCRIBED") {
-          await channel.track({ playerId, online_at: new Date().toISOString() });
           setConnected(true);
         }
       });
 
     channelRef.current = channel;
 
+    // Polling fallback every 2 seconds (in case Realtime misses something)
+    pollRef.current = setInterval(fetchState, 2000);
+
     return () => {
       channel.unsubscribe();
       channelRef.current = null;
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
     };
-  }, [gameCode, playerId]);
+  }, [gameCode, playerId, fetchState]);
 
   const sendAction = useCallback(
     async (action: string, data: Record<string, unknown> = {}) => {
@@ -73,11 +89,14 @@ export function useGame({ gameCode, playerId }: UseGameOptions) {
       if (!res.ok) {
         const err = await res.json();
         console.error("Action failed:", err);
-        return false;
+        return { success: false, ...err };
       }
-      return true;
+      const result = await res.json();
+      // Refetch state after action
+      fetchState();
+      return result;
     },
-    [gameCode, playerId]
+    [gameCode, playerId, fetchState]
   );
 
   const vote = useCallback(

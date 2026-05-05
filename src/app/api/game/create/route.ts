@@ -8,6 +8,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing playerId or pseudo" }, { status: 400 });
   }
 
-  const game = createNewGame(playerId, pseudo);
+  const game = await createNewGame(playerId, pseudo);
   return NextResponse.json({ code: game.code, gameId: game.id });
 }

@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const game = joinGame(code.toUpperCase(), playerId, pseudo);
+  const game = await joinGame(code.toUpperCase(), playerId, pseudo);
   if (!game) {
     return NextResponse.json({ error: "Game not found or already started" }, { status: 404 });
   }
